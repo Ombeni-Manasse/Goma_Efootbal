@@ -1,0 +1,66 @@
+{% extends 'league/base.html' %}
+
+{% block title %}Générer le calendrier - {{ league_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card bg-dark border-warning">
+            <div class="card-header bg-warning bg-opacity-25 text-center py-4">
+                <i class="fas fa-magic fa-3x text-warning mb-3"></i>
+                <h3 class="mb-0">Générer le calendrier</h3>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>{{ team_count }} équipes</strong> inscrites.
+                    {% if team_count >= 2 %}
+                        Le calendrier comprendra
+                        <strong>{{ team_count|add:"-1" }}</strong> journées en aller et
+                        <strong>{{ team_count|add:"-1" }}</strong> journées en retour.
+                    {% endif %}
+                </div>
+
+                {% if team_count < 2 %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Il faut au moins 2 équipes pour générer un calendrier.
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Attention :</strong> Générer un nouveau calendrier supprimera
+                        l'ancien calendrier et tous les résultats existants !
+                    </div>
+
+                    <h6 class="text-muted mb-3">Équipes participantes :</h6>
+                    <div class="row g-2 mb-4">
+                        {% for team in teams %}
+                            <div class="col-6 col-md-4">
+                                <div class="badge bg-primary w-100 p-2">
+                                    {{ team.name }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="mb-3 form-check">
+                                {{ field }}
+                                <label class="form-check-label" for="{{ field.id_for_label }}">
+                                    {{ field.label }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-warning btn-lg w-100 text-dark">
+                            <i class="fas fa-magic me-2"></i>Générer le calendrier
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

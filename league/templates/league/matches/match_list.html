@@ -1,0 +1,128 @@
+{% extends 'league/base.html' %}
+
+{% block title %}Calendrier - {{ league_name }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">
+    <i class="fas fa-calendar-alt me-2 text-primary"></i>Calendrier des matchs
+</h2>
+
+<!-- Filtres -->
+<div class="card bg-dark border-secondary mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label text-muted">Filtrer par équipe</label>
+                <select name="team" class="form-select">
+                    <option value="">Toutes les équipes</option>
+                    {% for team in teams %}
+                        <option value="{{ team.pk }}"
+                                {% if team_filter == team.pk|stringformat:"d" %}selected{% endif %}>
+                            {{ team.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Filtrer par journée</label>
+                <select name="matchday" class="form-select">
+                    <option value="">Toutes les journées</option>
+                    {% for md in matchdays %}
+                        <option value="{{ md }}"
+                                {% if matchday_filter == md|stringformat:"d" %}selected{% endif %}>
+                            Journée {{ md }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Phase</label>
+                <select name="phase" class="form-select">
+                    <option value="">Toutes les phases</option>
+                    <option value="aller" {% if phase_filter == 'aller' %}selected{% endif %}>
+                        Phase Aller
+                    </option>
+                    <option value="retour" {% if phase_filter == 'retour' %}selected{% endif %}>
+                        Phase Retour
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter me-1"></i> Filtrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Liste des matchs groupés par journée -->
+{% if grouped_matches %}
+    {% for group_name, matches in grouped_matches.items %}
+        <div class="card bg-dark border-secondary mb-3">
+            <div class="card-header bg-primary bg-opacity-10">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-day me-2 text-primary"></i>{{ group_name }}
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0">
+                        <tbody>
+                            {% for match in matches %}
+                                <tr>
+                                    <td class="text-end" style="width: 35%;">
+                                        <strong class="{% if match.is_played and match.result.home_score > match.result.away_score %}text-success{% endif %}">
+                                            {{ match.home_team.name }}
+                                        </strong>
+                                        <span class="badge bg-secondary ms-1">DOM</span>
+                                    </td>
+                                    <td class="text-center" style="width: 20%;">
+                                        {% if match.is_played and match.result %}
+                                            <span class="badge bg-primary fs-6 px-3 py-2">
+                                                {{ match.result.home_score }} - {{ match.result.away_score }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary fs-6 px-3 py-2">
+                                                VS
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="width: 35%;">
+                                        <span class="badge bg-info me-1">EXT</span>
+                                        <strong class="{% if match.is_played and match.result.away_score > match.result.home_score %}text-success{% endif %}">
+                                            {{ match.away_team.name }}
+                                        </strong>
+                                    </td>
+                                    <td class="text-end" style="width: 10%;">
+                                        {% if user.is_authenticated and user.is_staff %}
+                                            <a href="{% url 'league:add_result' match.pk %}"
+                                               class="btn btn-sm {% if match.is_played %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                                                {% if match.is_played %}
+                                                    <i class="fas fa-edit"></i>
+                                                {% else %}
+                                                    <i class="fas fa-plus"></i>
+                                                {% endif %}
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted">Aucun match au calendrier</h4>
+        {% if user.is_authenticated and user.is_staff %}
+            <a href="{% url 'league:generate_calendar' %}" class="btn btn-primary mt-3">
+                <i class="fas fa-magic me-1"></i> Générer le calendrier
+            </a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

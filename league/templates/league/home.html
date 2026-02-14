@@ -1,0 +1,357 @@
+{% extends 'league/base.html' %}
+{% load league_tags %}
+
+{% block title %}Accueil - {{ league_name }}{% endblock %}
+
+{% block content %}
+<!-- ======================== -->
+<!-- HERO SECTION -->
+<!-- ======================== -->
+<div class="hero-section text-center py-5 mb-4">
+    <div class="container">
+        <h1 class="display-4 fw-bold text-primary glow-text">
+            <i class="fas fa-gamepad me-3"></i>GOMA-Efootball League
+        </h1>
+        <p class="lead text-light mt-3">
+            La compétition eFootball ultime de Goma
+        </p>
+        <div class="mt-4">
+            <a href="{% url 'league:standings' %}" class="btn btn-primary btn-lg me-2">
+                <i class="fas fa-trophy me-2"></i>Voir le classement
+            </a>
+            <a href="{% url 'league:match_list' %}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-calendar-alt me-2"></i>Calendrier
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== -->
+<!-- CARTES STATISTIQUES -->
+<!-- ======================== -->
+<div class="row g-3 mb-4">
+    <!-- Total équipes -->
+    <div class="col-6 col-md-3">
+        <div class="card stat-card bg-dark border-primary h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                <h2 class="fw-bold text-primary counter">{{ total_teams }}</h2>
+                <small class="text-muted">Équipes</small>
+            </div>
+        </div>
+    </div>
+    <!-- Matchs joués -->
+    <div class="col-6 col-md-3">
+        <div class="card stat-card bg-dark border-success h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-futbol fa-2x text-success mb-2"></i>
+                <h2 class="fw-bold text-success counter">{{ matches_played }}</h2>
+                <small class="text-muted">Matchs joués</small>
+            </div>
+        </div>
+    </div>
+    <!-- Total buts -->
+    <div class="col-6 col-md-3">
+        <div class="card stat-card bg-dark border-warning h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-bullseye fa-2x text-warning mb-2"></i>
+                <h2 class="fw-bold text-warning counter">{{ total_goals }}</h2>
+                <small class="text-muted">Buts marqués</small>
+            </div>
+        </div>
+    </div>
+    <!-- Progression -->
+    <div class="col-6 col-md-3">
+        <div class="card stat-card bg-dark border-info h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-2x text-info mb-2"></i>
+                <h2 class="fw-bold text-info">{{ progress }}%</h2>
+                <small class="text-muted">Progression</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Barre de progression -->
+<div class="card bg-dark border-secondary mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Avancement de la compétition</span>
+            <span class="text-primary fw-bold">{{ matches_played }}/{{ total_matches }} matchs</span>
+        </div>
+        <div class="progress" style="height: 20px;">
+            <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated"
+                 role="progressbar" style="width: {{ progress }}%"
+                 aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+                {{ progress }}%
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- ======================== -->
+    <!-- TOP CLASSEMENT -->
+    <!-- ======================== -->
+    <div class="col-lg-6">
+        <div class="card bg-dark border-primary h-100">
+            <div class="card-header bg-primary bg-opacity-25">
+                <h5 class="mb-0">
+                    <i class="fas fa-trophy me-2 text-warning"></i>Top Classement
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if top_standings %}
+                    <table class="table table-dark table-hover mb-0">
+                        <thead>
+                            <tr class="text-muted small">
+                                <th>#</th>
+                                <th>Équipe</th>
+                                <th class="text-center">MJ</th>
+                                <th class="text-center">Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for standing in top_standings %}
+                                <tr>
+                                    <td>
+                                        <span class="badge {{ standing.position|get_badge_class }}">
+                                            {{ standing.position }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <strong>{{ standing.team.name }}</strong>
+                                    </td>
+                                    <td class="text-center">{{ standing.played }}</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary fs-6">{{ standing.points }}</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-info-circle fa-2x mb-2"></i>
+                        <p>Aucune donnée de classement</p>
+                    </div>
+                {% endif %}
+                <div class="card-footer bg-transparent text-center">
+                    <a href="{% url 'league:standings' %}" class="btn btn-outline-primary btn-sm">
+                        Voir classement complet <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================== -->
+    <!-- DERNIERS RÉSULTATS -->
+    <!-- ======================== -->
+    <div class="col-lg-6">
+        <div class="card bg-dark border-success h-100">
+            <div class="card-header bg-success bg-opacity-25">
+                <h5 class="mb-0">
+                    <i class="fas fa-futbol me-2 text-success"></i>Derniers Résultats
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if last_results %}
+                    {% for result in last_results %}
+                        <div class="match-result-card p-3 mb-2 rounded bg-dark border border-secondary">
+                            <div class="row align-items-center text-center">
+                                <div class="col-4">
+                                    <strong class="{% if result.home_score > result.away_score %}text-success{% elif result.home_score < result.away_score %}text-danger{% else %}text-warning{% endif %}">
+                                        {{ result.match.home_team.name }}
+                                    </strong>
+                                </div>
+                                <div class="col-4">
+                                    <span class="score-display fs-4 fw-bold">
+                                        {{ result.home_score }} - {{ result.away_score }}
+                                    </span>
+                                </div>
+                                <div class="col-4">
+                                    <strong class="{% if result.away_score > result.home_score %}text-success{% elif result.away_score < result.home_score %}text-danger{% else %}text-warning{% endif %}">
+                                        {{ result.match.away_team.name }}
+                                    </strong>
+                                </div>
+                            </div>
+                            <div class="text-center mt-1">
+                                <small class="text-muted">
+                                    {{ result.match.get_phase_display }} - Journée {{ result.match.matchday }}
+                                </small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-info-circle fa-2x mb-2"></i>
+                        <p>Aucun résultat enregistré</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== -->
+<!-- PROCHAINS MATCHS -->
+<!-- ======================== -->
+<div class="row g-4 mt-2">
+    <div class="col-12">
+        <div class="card bg-dark border-info">
+            <div class="card-header bg-info bg-opacity-25">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-2 text-info"></i>Prochains Matchs
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if next_matches %}
+                    <div class="row g-3">
+                        {% for match in next_matches %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card bg-dark border-secondary match-card">
+                                    <div class="card-body text-center">
+                                        <small class="text-muted d-block mb-2">
+                                            {{ match.get_phase_display }} - Journée {{ match.matchday }}
+                                        </small>
+                                        <div class="d-flex justify-content-around align-items-center">
+                                            <div>
+                                                <strong class="text-light">{{ match.home_team.name }}</strong>
+                                            </div>
+                                            <span class="badge bg-secondary mx-2">VS</span>
+                                            <div>
+                                                <strong class="text-light">{{ match.away_team.name }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+                        <p>Tous les matchs ont été joués !</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== -->
+<!-- GRAPHIQUE DES BUTS -->
+<!-- ======================== -->
+{% if total_goals > 0 %}
+<div class="row g-4 mt-2">
+    <div class="col-lg-8">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2 text-primary"></i>Buts par Équipe
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="goalsChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card bg-dark border-secondary h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-pie me-2 text-warning"></i>Statistiques
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush bg-transparent">
+                    <li class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                        <span><i class="fas fa-futbol me-2 text-primary"></i>Total buts</span>
+                        <strong>{{ total_goals }}</strong>
+                    </li>
+                    <li class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                        <span><i class="fas fa-calculator me-2 text-info"></i>Moyenne/match</span>
+                        <strong>{{ avg_goals }}</strong>
+                    </li>
+                    {% if best_attack %}
+                    <li class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                        <span><i class="fas fa-fire me-2 text-danger"></i>Meilleure attaque</span>
+                        <strong>{{ best_attack.team.name }}</strong>
+                    </li>
+                    {% endif %}
+                    {% if best_defense %}
+                    <li class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                        <span><i class="fas fa-shield-alt me-2 text-success"></i>Meilleure défense</span>
+                        <strong>{{ best_defense.team.name }}</strong>
+                    </li>
+                    {% endif %}
+                    <li class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                        <span><i class="fas fa-calendar me-2 text-warning"></i>Matchs restants</span>
+                        <strong>{{ matches_remaining }}</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Charger les statistiques de buts et créer le graphique
+fetch("{% url 'league:api_goals_stats' %}")
+    .then(response => response.json())
+    .then(data => {
+        if (data.teams && data.teams.length > 0) {
+            const ctx = document.getElementById('goalsChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.teams,
+                        datasets: [
+                            {
+                                label: 'Buts marqués',
+                                data: data.goals_for,
+                                backgroundColor: 'rgba(13, 110, 253, 0.7)',
+                                borderColor: 'rgba(13, 110, 253, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Buts encaissés',
+                                data: data.goals_against,
+                                backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                                borderColor: 'rgba(220, 53, 69, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#fff' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { color: '#adb5bd' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            },
+                            x: {
+                                ticks: { color: '#adb5bd' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    })
+    .catch(err => console.log('Pas de données pour le graphique'));
+</script>
+{% endblock %}

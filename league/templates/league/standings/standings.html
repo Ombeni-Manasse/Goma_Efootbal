@@ -1,0 +1,106 @@
+{% extends 'league/base.html' %}
+{% load league_tags %}
+
+{% block title %}Classement - {{ league_name }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">
+    <i class="fas fa-trophy me-2 text-warning"></i>Classement Général
+</h2>
+
+{% if standings %}
+    <div class="card bg-dark border-secondary">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover table-striped mb-0 standings-table">
+                    <thead class="table-primary">
+                        <tr>
+                            <th class="text-center" style="width: 5%;">#</th>
+                            <th style="width: 20%;">Équipe</th>
+                            <th class="text-center" title="Matchs joués">MJ</th>
+                            <th class="text-center text-success" title="Victoires">V</th>
+                            <th class="text-center text-warning" title="Nuls">N</th>
+                            <th class="text-center text-danger" title="Défaites">D</th>
+                            <th class="text-center" title="Buts Pour">BP</th>
+                            <th class="text-center" title="Buts Contre">BC</th>
+                            <th class="text-center" title="Différence de buts">DIFF</th>
+                            <th class="text-center" title="Points" style="width: 8%;">PTS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for standing in standings %}
+                            <tr class="{% if standing.position <= 4 %}table-active{% endif %}">
+                                <td class="text-center">
+                                    <span class="badge {{ standing.position|get_badge_class }} fs-6">
+                                        {{ standing.position }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if standing.team.logo %}
+                                            <img src="{{ standing.team.logo.url }}"
+                                                 class="rounded-circle me-2"
+                                                 style="width: 30px; height: 30px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center me-2"
+                                                 style="width: 30px; height: 30px; background: linear-gradient(135deg, #0d6efd, #6610f2); font-size: 0.8rem;">
+                                                <span class="fw-bold text-white">
+                                                    {{ standing.team.name|first }}
+                                                </span>
+                                            </div>
+                                        {% endif %}
+                                        <a href="{% url 'league:team_detail' standing.team.pk %}"
+                                           class="text-decoration-none text-light fw-bold">
+                                            {{ standing.team.name }}
+                                        </a>
+                                        {% if standing.position <= 4 %}
+                                            <i class="fas fa-star text-warning ms-2" title="Qualifié phase finale"></i>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="text-center">{{ standing.played }}</td>
+                                <td class="text-center text-success fw-bold">{{ standing.won }}</td>
+                                <td class="text-center text-warning">{{ standing.drawn }}</td>
+                                <td class="text-center text-danger">{{ standing.lost }}</td>
+                                <td class="text-center">{{ standing.goals_for }}</td>
+                                <td class="text-center">{{ standing.goals_against }}</td>
+                                <td class="text-center">
+                                    <span class="{% if standing.goal_difference > 0 %}text-success{% elif standing.goal_difference < 0 %}text-danger{% else %}text-muted{% endif %} fw-bold">
+                                        {% if standing.goal_difference > 0 %}+{% endif %}{{ standing.goal_difference }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary fs-5 px-3">
+                                        {{ standing.points }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Légende -->
+    <div class="card bg-dark border-secondary mt-3">
+        <div class="card-body">
+            <h6 class="text-muted mb-3">Légende</h6>
+            <div class="d-flex flex-wrap gap-3">
+                <span><span class="badge bg-warning text-dark">1</span> Champion</span>
+                <span><span class="badge bg-secondary">2</span> 2ème place</span>
+                <span><span class="badge bg-danger">3</span> 3ème place</span>
+                <span><span class="badge bg-success">4</span> Qualifié playoffs</span>
+                <span class="text-muted">|</span>
+                <span class="text-muted small">V = Victoire (3pts) | N = Nul (1pt) | D = Défaite (0pt)</span>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-trophy fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted">Classement non disponible</h4>
+        <p class="text-muted">Le classement sera calculé une fois les résultats enregistrés.</p>
+    </div>
+{% endif %}
+{% endblock %}

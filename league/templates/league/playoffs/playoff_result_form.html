@@ -1,0 +1,85 @@
+{% extends 'league/base.html' %}
+
+{% block title %}{{ playoff_match.get_round_type_display }} - {{ league_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card bg-dark border-warning">
+            <div class="card-header bg-warning bg-opacity-25 text-center py-3">
+                <span class="badge bg-warning text-dark mb-2">
+                    {{ playoff_match.get_round_type_display }}
+                </span>
+                <h4 class="mb-0">Enregistrer le résultat</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row align-items-center text-center mb-4">
+                        <div class="col-5">
+                            <h5 class="text-primary">{{ playoff_match.home_team.name }}</h5>
+                            <span class="badge bg-secondary">Domicile</span>
+                            <div class="mt-2">{{ form.home_score }}</div>
+                        </div>
+                        <div class="col-2">
+                            <span class="text-muted fs-3 fw-bold">-</span>
+                        </div>
+                        <div class="col-5">
+                            <h5 class="text-success">{{ playoff_match.away_team.name }}</h5>
+                            <span class="badge bg-info">Extérieur</span>
+                            <div class="mt-2">{{ form.away_score }}</div>
+                        </div>
+                    </div>
+
+                    <hr class="border-secondary">
+
+                    <h6 class="text-muted mb-3">Options supplémentaires</h6>
+                    <div class="mb-3 form-check">
+                        {{ form.has_extra_time }}
+                        <label class="form-check-label" for="{{ form.has_extra_time.id_for_label }}">
+                            <i class="fas fa-clock me-1 text-info"></i> Prolongations
+                        </label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form.has_penalties }}
+                        <label class="form-check-label" for="{{ form.has_penalties.id_for_label }}">
+                            <i class="fas fa-bullseye me-1 text-warning"></i> Tirs au but
+                        </label>
+                    </div>
+                    <div class="mb-3" id="penalty-winner-group" style="display: none;">
+                        <label class="form-label">Vainqueur aux tirs au but</label>
+                        {{ form.penalty_winner }}
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'league:playoffs' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Retour
+                        </a>
+                        <button type="submit" class="btn btn-warning btn-lg text-dark">
+                            <i class="fas fa-save me-1"></i> Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Afficher/masquer le champ penalty_winner selon la case à cocher
+    const penaltiesCheck = document.getElementById('{{ form.has_penalties.id_for_label }}');
+    const penaltyGroup = document.getElementById('penalty-winner-group');
+
+    if (penaltiesCheck) {
+        penaltiesCheck.addEventListener('change', function() {
+            penaltyGroup.style.display = this.checked ? 'block' : 'none';
+        });
+        // État initial
+        if (penaltiesCheck.checked) {
+            penaltyGroup.style.display = 'block';
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'league/base.html' %}
+
+{% block title %}Équipes - {{ league_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="fas fa-users me-2 text-primary"></i>Équipes participantes
+        <span class="badge bg-primary ms-2">{{ teams|length }}</span>
+    </h2>
+    {% if user.is_authenticated and user.is_staff %}
+        <a href="{% url 'league:team_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Ajouter une équipe
+        </a>
+    {% endif %}
+</div>
+
+{% if teams %}
+    <div class="row g-4">
+        {% for team in teams %}
+            <div class="col-md-6 col-lg-4 col-xl-3">
+                <div class="card bg-dark border-secondary team-card h-100">
+                    <div class="card-body text-center">
+                        <!-- Logo -->
+                        <div class="team-logo-container mb-3">
+                            {% if team.logo %}
+                                <img src="{{ team.logo.url }}" alt="{{ team.name }}"
+                                     class="team-logo rounded-circle"
+                                     style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                                <div class="team-logo-placeholder rounded-circle d-flex align-items-center justify-content-center mx-auto"
+                                     style="width: 80px; height: 80px; background: linear-gradient(135deg, #0d6efd, #6610f2);">
+                                    <span class="fw-bold text-white fs-3">
+                                        {{ team.name|first }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <!-- Infos -->
+                        <h5 class="card-title text-light mb-1">{{ team.name }}</h5>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-user me-1"></i> {{ team.player_name }}
+                        </p>
+                        <p class="text-primary mb-2">
+                            <i class="fas fa-gamepad me-1"></i> {{ team.gamer_pseudo }}
+                        </p>
+                        {% if team.contact %}
+                            <p class="text-muted small mb-0">
+                                <i class="fas fa-phone me-1"></i> {{ team.contact }}
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent d-flex justify-content-between">
+                        <a href="{% url 'league:team_detail' team.pk %}"
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i> Détails
+                        </a>
+                        {% if user.is_authenticated and user.is_staff %}
+                            <div>
+                                <a href="{% url 'league:team_edit' team.pk %}"
+                                   class="btn btn-outline-warning btn-sm me-1">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'league:team_delete' team.pk %}"
+                                   class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-users-slash fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted">Aucune équipe inscrite</h4>
+        {% if user.is_authenticated and user.is_staff %}
+            <a href="{% url 'league:team_create' %}" class="btn btn-primary mt-3">
+                <i class="fas fa-plus me-1"></i> Ajouter la première équipe
+            </a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'league/base.html' %}
+
+{% block title %}Règlement - {{ league_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h2 class="mb-4">
+            <i class="fas fa-book me-2 text-primary"></i>Règlement de la Compétition
+        </h2>
+
+        <!-- Règles générales -->
+        <div class="card bg-dark border-primary mb-4">
+            <div class="card-header bg-primary bg-opacity-25">
+                <h4 class="mb-0"><i class="fas fa-gamepad me-2"></i>Règles de Match</h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush bg-transparent">
+                    <li class="list-group-item bg-transparent text-light border-secondary">
+                        <i class="fas fa-check text-success me-2"></i>
+                        <strong>Type de match :</strong> Match d'amis
+                    </li>
+                    <li class="list-group-item bg-transparent text-light border-secondary">
+                        <i class="fas fa-clock text-info me-2"></i>
+                        <strong>Durée :</strong> 10 minutes
+                    </li>
+                    <li class="list-group-item bg-transparent text-light border-secondary">
+                        <i class="fas fa-sun text-warning me-2"></i>
+                        <strong>Conditions :</strong> Excellente (domicile / extérieur)
+                    </li>
+                    <li class="list-group-item bg-transparent text-light border-secondary">
+                        <i class="fas fa-mobile-alt text-primary me-2"></i>
+                        <strong>Contrôle libre :</strong> Manette ou Tactile
+                    </li>
+                    <li class="list-group-item bg-transparent text-light border-secondary">
+                        <i class="fas fa-user-shield text-danger me-2"></i>
+                        <strong>Validation :</strong> Scores validés par l'administrateur uniquement
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Système de points -->
+        <div class="card bg-dark border-success mb-4">
+            <div class="card-header bg-success bg-opacity-25">
+                <h4 class="mb-0"><i class="fas fa-calculator me-2"></i>Système de Points</h4>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 text-center">
+                    <div class="col-4">
+                        <div class="card bg-success bg-opacity-25 border-success">
+                            <div class="card-body">
+                                <h2 class="text-success fw-bold">3</h2>
+                                <span class="text-light">Victoire</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card bg-warning bg-opacity-25 border-warning">
+                            <div class="card-body">
+                                <h2 class="text-warning fw-bold">1</h2>
+                                <span class="text-light">Match nul</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card bg-danger bg-opacity-25 border-danger">
+                            <div class="card-body">
+                                <h2 class="text-danger fw-bold">0</h2>
+                                <span class="text-light">Défaite</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Format compétition -->
+        <div class="card bg-dark border-warning mb-4">
+            <div class="card-header bg-warning bg-opacity-25">
+                <h4 class="mb-0"><i class="fas fa-sitemap me-2"></i>Format de la Compétition</h4>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <h6 class="text-primary"><i class="fas fa-list me-1"></i> Phase de Groupes</h6>
+                        <ul class="text-light">
+                            <li>Championnat aller-retour</li>
+                            <li>Tous contre tous</li>
+                            <li>Classement par points</li>
+                            <li>Top 4 qualifiés pour la phase finale</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-warning"><i class="fas fa-crown me-1"></i> Phase Finale</h6>
+                        <ul class="text-light">
+                            <li>Demi-finales aller-retour</li>
+                            <li>1er vs 4ème / 2ème vs 3ème</li>
+                            <li>Match de 3ème place</li>
+                            <li>Grande Finale</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Critères de départage -->
+        <div class="card bg-dark border-info mb-4">
+            <div class="card-header bg-info bg-opacity-25">
+                <h4 class="mb-0"><i class="fas fa-balance-scale me-2"></i>Critères de Départage</h4>
+            </div>
+            <div class="card-body">
+                <ol class="text-light">
+                    <li class="mb-2">Nombre de <strong class="text-primary">points</strong></li>
+                    <li class="mb-2"><strong class="text-info">Différence de buts</strong> générale</li>
+                    <li class="mb-2">Nombre de <strong class="text-success">buts marqués</strong></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

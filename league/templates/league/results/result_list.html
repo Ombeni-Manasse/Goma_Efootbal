@@ -1,0 +1,50 @@
+{% extends 'league/base.html' %}
+
+{% block title %}Résultats - {{ league_name }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">
+    <i class="fas fa-futbol me-2 text-success"></i>Résultats
+</h2>
+
+{% if grouped_results %}
+    {% for group_name, results in grouped_results.items %}
+        <div class="card bg-dark border-secondary mb-3">
+            <div class="card-header bg-success bg-opacity-10">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-check me-2 text-success"></i>{{ group_name }}
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for result in results %}
+                    <div class="match-result-card p-3 mb-2 rounded bg-dark border border-secondary">
+                        <div class="row align-items-center text-center">
+                            <div class="col-4 col-md-4">
+                                <strong class="{% if result.home_score > result.away_score %}text-success{% elif result.home_score < result.away_score %}text-danger{% else %}text-warning{% endif %}">
+                                    {{ result.match.home_team.name }}
+                                </strong>
+                            </div>
+                            <div class="col-4 col-md-4">
+                                <span class="badge bg-primary fs-5 px-3 py-2">
+                                    {{ result.home_score }} - {{ result.away_score }}
+                                </span>
+                            </div>
+                            <div class="col-4 col-md-4">
+                                <strong class="{% if result.away_score > result.home_score %}text-success{% elif result.away_score < result.home_score %}text-danger{% else %}text-warning{% endif %}">
+                                    {{ result.match.away_team.name }}
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-clock fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted">Aucun résultat enregistré</h4>
+        <p class="text-muted">Les résultats apparaîtront ici une fois les matchs joués.</p>
+    </div>
+{% endif %}
+{% endblock %}
