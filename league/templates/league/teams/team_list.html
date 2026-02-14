@@ -8,12 +8,15 @@
         <i class="fas fa-users me-2 text-primary"></i>Équipes participantes
         <span class="badge bg-primary ms-2">{{ teams|length }}</span>
     </h2>
+
+    <!-- Bouton visible pour TOUS les admins connectés -->
     {% if user.is_authenticated and user.is_staff %}
-        <a href="{% url 'league:team_create' %}" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i> Ajouter une équipe
+        <a href="{% url 'league:team_create' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus me-2"></i>Ajouter une équipe
         </a>
     {% endif %}
 </div>
+
 
 {% if teams %}
     <div class="row g-4">
@@ -77,8 +80,8 @@
         <i class="fas fa-users-slash fa-4x text-muted mb-3"></i>
         <h4 class="text-muted">Aucune équipe inscrite</h4>
         {% if user.is_authenticated and user.is_staff %}
-            <a href="{% url 'league:team_create' %}" class="btn btn-primary mt-3">
-                <i class="fas fa-plus me-1"></i> Ajouter la première équipe
+            <a href="{% url 'league:team_create' %}" class="btn btn-primary btn-lg mt-3">
+                <i class="fas fa-plus me-2"></i>Ajouter la première équipe
             </a>
         {% endif %}
     </div>

@@ -62,6 +62,8 @@ urlpatterns = [
     path('admin-panel/admins/', views.manage_admins, name='manage_admins'),
     path('admin-panel/admins/creer/', views.create_admin, name='create_admin'),
     path('admin-panel/admins/<int:pk>/supprimer/', views.delete_admin, name='delete_admin'),
+   
+
 
     # ========================
     # API JSON

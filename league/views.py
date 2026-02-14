@@ -381,9 +381,13 @@ def admin_dashboard(request):
 
 # --- CRUD Équipes ---
 
-@admin_required
+
 def team_create(request):
     """Créer une nouvelle équipe."""
+    if not request.user.is_authenticated or not request.user.is_staff:
+        messages.warning(request, "Veuillez vous connecter en tant qu'admin.")
+        return redirect('league:login')
+
     if request.method == 'POST':
         form = TeamForm(request.POST, request.FILES)
         if form.is_valid():

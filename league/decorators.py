@@ -9,26 +9,29 @@ from django.contrib import messages
 
 def admin_required(view_func):
     """
-    Décorateur qui vérifie que l'utilisateur est un admin connecté.
-    Redirige vers la page de login sinon.
+    Vérifie que l'utilisateur est un admin connecté.
     """
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
+        # Vérifier si connecté
         if not request.user.is_authenticated:
             messages.warning(request, "Veuillez vous connecter.")
             return redirect('league:login')
+
+        # Vérifier si staff
         if not request.user.is_staff:
             messages.error(request, "Accès réservé aux administrateurs.")
             return redirect('league:home')
-        # Vérifier si l'admin doit changer son mot de passe
-        if hasattr(request.user, 'admin_profile'):
-            if request.user.admin_profile.must_change_password:
-                # Ne pas rediriger si on est déjà sur la page de changement
-                if request.path != '/change-password/':
-                    messages.info(
-                        request,
-                        "Vous devez changer votre mot de passe avant de continuer."
-                    )
+
+        # Vérifier changement mot de passe obligatoire
+        try:
+            profile = request.user.admin_profile
+            if profile.must_change_password:
+                if 'change-password' not in request.path:
                     return redirect('league:change_password')
+        except Exception:
+            # Pas de profil admin, on laisse passer
+            pass
+
         return view_func(request, *args, **kwargs)
     return wrapper
