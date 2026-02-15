@@ -6,3 +6,4 @@ whitenoise>=6.5
 gunicorn>=21.2
 psycopg2-binary>=2.9
 dj-database-url>=2.1
+pymysql>=1.1

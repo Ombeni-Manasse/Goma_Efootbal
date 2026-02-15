@@ -5,26 +5,28 @@ Paramètres de développement et production.
 
 import os
 from pathlib import Path
-import dj_database_url
 
 # Répertoire de base du projet
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Clé secrète - EN PRODUCTION, utiliser variable d'environnement
+# Clé secrète
 SECRET_KEY = os.environ.get(
     'DJANGO_SECRET_KEY',
     'django-insecure-goma-efootball-dev-key-change-in-production-2024'
 )
 
-# Mode debug - False en production
+# Mode debug
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
 
 # Hôtes autorisés
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,.onrender.com').split(',')
+ALLOWED_HOSTS = os.environ.get(
+    'DJANGO_ALLOWED_HOSTS',
+    'localhost,127.0.0.1,.pythonanywhere.com,.onrender.com'
+).split(',')
 
-# CSRF Origins autorisés (obligatoire en production avec Django 4+)
+# CSRF Origins autorisés
 CSRF_TRUSTED_ORIGINS = [
-    'https://goma-efootball-xqr0.onrender.com',
+    'https://*.pythonanywhere.com',
     'https://*.onrender.com',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
@@ -40,10 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Applications tierces
     'crispy_forms',
     'crispy_bootstrap5',
-    # Notre application
     'league.apps.LeagueConfig',
 ]
 
@@ -88,7 +88,29 @@ WSGI_APPLICATION = 'goma_efootball.wsgi.application'
 # ========================
 # BASE DE DONNÉES
 # ========================
-if os.environ.get('DATABASE_URL'):
+# PythonAnywhere : MySQL
+# Render : PostgreSQL via DATABASE_URL
+# Local : SQLite
+if os.environ.get('PYTHONANYWHERE_SITE'):
+    # PyMySQL comme remplacement de mysqlclient
+    import pymysql
+    pymysql.install_as_MySQLdb()
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'HOST': os.environ.get('MYSQL_HOST', ''),
+            'NAME': os.environ.get('MYSQL_NAME', ''),
+            'USER': os.environ.get('MYSQL_USER', ''),
+            'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
+            'OPTIONS': {
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'charset': 'utf8mb4',
+            },
+        }
+    }
+elif os.environ.get('DATABASE_URL'):
+    import dj_database_url
     DATABASES = {
         'default': dj_database_url.config(
             default=os.environ.get('DATABASE_URL'),
@@ -123,7 +145,7 @@ USE_I18N = True
 USE_TZ = True
 
 # ========================
-# FICHIERS STATIQUES (CSS, JavaScript, Images)
+# FICHIERS STATIQUES
 # ========================
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -131,7 +153,6 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 _static_dir = BASE_DIR / 'static'
 STATICFILES_DIRS = [_static_dir] if _static_dir.is_dir() else []
 
-# WhiteNoise pour servir les fichiers statiques en production
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -142,7 +163,7 @@ STORAGES = {
 }
 
 # ========================
-# FICHIERS MÉDIA (uploads utilisateurs)
+# FICHIERS MÉDIA
 # ========================
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -155,7 +176,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 # ========================
-# CRISPY FORMS (Bootstrap 5)
+# CRISPY FORMS
 # ========================
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
