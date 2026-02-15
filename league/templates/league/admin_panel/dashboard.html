@@ -12,7 +12,7 @@
     </span>
 </div>
 
-<!-- Cartes d'actions rapides -->
+<!-- Cartes statistiques -->
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
         <div class="card bg-dark border-primary stat-card h-100">
@@ -26,7 +26,7 @@
     <div class="col-6 col-md-3">
         <div class="card bg-dark border-success stat-card h-100">
             <div class="card-body text-center">
-                <i class="fas fa-futbol fa-2x text-success mb-2"></i>
+                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
                 <h3 class="text-success">{{ matches_played }}</h3>
                 <small class="text-muted">Matchs joués</small>
             </div>
@@ -35,22 +35,87 @@
     <div class="col-6 col-md-3">
         <div class="card bg-dark border-warning stat-card h-100">
             <div class="card-body text-center">
-                <i class="fas fa-bullseye fa-2x text-warning mb-2"></i>
-                <h3 class="text-warning">{{ total_goals }}</h3>
-                <small class="text-muted">Total buts</small>
+                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                <h3 class="text-warning">{{ matches_not_played }}</h3>
+                <small class="text-muted">Matchs restants</small>
             </div>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <div class="card bg-dark border-danger stat-card h-100">
+        <div class="card bg-dark border-info stat-card h-100">
             <div class="card-body text-center">
-                <i class="fas fa-exclamation-circle fa-2x text-danger mb-2"></i>
-                <h3 class="text-danger">{{ unvalidated_results }}</h3>
-                <small class="text-muted">En attente</small>
+                <i class="fas fa-bullseye fa-2x text-info mb-2"></i>
+                <h3 class="text-info">{{ total_goals }}</h3>
+                <small class="text-muted">Total buts</small>
             </div>
         </div>
     </div>
 </div>
+
+<!-- ======================== -->
+<!-- ENREGISTRER DES RÉSULTATS -->
+<!-- ======================== -->
+{% if unplayed_matches %}
+<div class="card bg-dark border-success mb-4">
+    <div class="card-header bg-success bg-opacity-25">
+        <h5 class="mb-0">
+            <i class="fas fa-futbol me-2 text-success"></i>
+            Enregistrer des résultats
+            <span class="badge bg-success ms-2">{{ matches_not_played }} matchs restants</span>
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0">
+                <thead>
+                    <tr class="text-muted small">
+                        <th>Journée</th>
+                        <th>Phase</th>
+                        <th class="text-end">Domicile</th>
+                        <th class="text-center">VS</th>
+                        <th>Extérieur</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in unplayed_matches %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-secondary">J{{ match.matchday }}</span>
+                            </td>
+                            <td>
+                                <span class="badge {% if match.phase == 'aller' %}bg-info{% else %}bg-warning text-dark{% endif %}">
+                                    {{ match.get_phase_display }}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <strong>{{ match.home_team.name }}</strong>
+                            </td>
+                            <td class="text-center">
+                                <span class="text-muted">VS</span>
+                            </td>
+                            <td>
+                                <strong>{{ match.away_team.name }}</strong>
+                            </td>
+                            <td class="text-center">
+                                <a href="{% url 'league:add_result' match.pk %}"
+                                   class="btn btn-success btn-sm">
+                                    <i class="fas fa-plus me-1"></i> Score
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer bg-transparent text-center">
+        <a href="{% url 'league:match_list' %}?status=pending" class="btn btn-outline-success">
+            <i class="fas fa-list me-1"></i> Voir tous les matchs non joués
+        </a>
+    </div>
+</div>
+{% endif %}
 
 <!-- Actions admin -->
 <div class="row g-4 mb-4">
@@ -196,7 +261,9 @@
                     <tr>
                         <td>{{ result.match }}</td>
                         <td class="text-center">
-                            {{ result.home_score }} - {{ result.away_score }}
+                            <span class="badge bg-primary fs-6">
+                                {{ result.home_score }} - {{ result.away_score }}
+                            </span>
                         </td>
                         <td class="text-center">
                             <a href="{% url 'league:validate_result' result.pk %}"

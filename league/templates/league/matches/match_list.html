@@ -11,10 +11,10 @@
 <div class="card bg-dark border-secondary mb-4">
     <div class="card-body">
         <form method="get" class="row g-3 align-items-end">
-            <div class="col-md-3">
-                <label class="form-label text-muted">Filtrer par équipe</label>
+            <div class="col-md-2">
+                <label class="form-label text-muted">Équipe</label>
                 <select name="team" class="form-select">
-                    <option value="">Toutes les équipes</option>
+                    <option value="">Toutes</option>
                     {% for team in teams %}
                         <option value="{{ team.pk }}"
                                 {% if team_filter == team.pk|stringformat:"d" %}selected{% endif %}>
@@ -23,10 +23,10 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-3">
-                <label class="form-label text-muted">Filtrer par journée</label>
+            <div class="col-md-2">
+                <label class="form-label text-muted">Journée</label>
                 <select name="matchday" class="form-select">
-                    <option value="">Toutes les journées</option>
+                    <option value="">Toutes</option>
                     {% for md in matchdays %}
                         <option value="{{ md }}"
                                 {% if matchday_filter == md|stringformat:"d" %}selected{% endif %}>
@@ -35,15 +35,23 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label text-muted">Phase</label>
                 <select name="phase" class="form-select">
-                    <option value="">Toutes les phases</option>
-                    <option value="aller" {% if phase_filter == 'aller' %}selected{% endif %}>
-                        Phase Aller
+                    <option value="">Toutes</option>
+                    <option value="aller" {% if phase_filter == 'aller' %}selected{% endif %}>Aller</option>
+                    <option value="retour" {% if phase_filter == 'retour' %}selected{% endif %}>Retour</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Statut</label>
+                <select name="status" class="form-select">
+                    <option value="">Tous</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>
+                        Non joués
                     </option>
-                    <option value="retour" {% if phase_filter == 'retour' %}selected{% endif %}>
-                        Phase Retour
+                    <option value="played" {% if status_filter == 'played' %}selected{% endif %}>
+                        Joués
                     </option>
                 </select>
             </div>
@@ -56,7 +64,7 @@
     </div>
 </div>
 
-<!-- Liste des matchs groupés par journée -->
+<!-- Liste des matchs -->
 {% if grouped_matches %}
     {% for group_name, matches in grouped_matches.items %}
         <div class="card bg-dark border-secondary mb-3">
@@ -71,7 +79,7 @@
                         <tbody>
                             {% for match in matches %}
                                 <tr>
-                                    <td class="text-end" style="width: 35%;">
+                                    <td class="text-end" style="width: 30%;">
                                         <strong class="{% if match.is_played and match.result.home_score > match.result.away_score %}text-success{% endif %}">
                                             {{ match.home_team.name }}
                                         </strong>
@@ -88,22 +96,31 @@
                                             </span>
                                         {% endif %}
                                     </td>
-                                    <td style="width: 35%;">
+                                    <td style="width: 30%;">
                                         <span class="badge bg-info me-1">EXT</span>
                                         <strong class="{% if match.is_played and match.result.away_score > match.result.home_score %}text-success{% endif %}">
                                             {{ match.away_team.name }}
                                         </strong>
                                     </td>
-                                    <td class="text-end" style="width: 10%;">
+                                    <td class="text-end" style="width: 20%;">
                                         {% if user.is_authenticated and user.is_staff %}
-                                            <a href="{% url 'league:add_result' match.pk %}"
-                                               class="btn btn-sm {% if match.is_played %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
-                                                {% if match.is_played %}
-                                                    <i class="fas fa-edit"></i>
-                                                {% else %}
-                                                    <i class="fas fa-plus"></i>
-                                                {% endif %}
-                                            </a>
+                                            {% if match.is_played %}
+                                                <a href="{% url 'league:add_result' match.pk %}"
+                                                   class="btn btn-sm btn-outline-warning">
+                                                    <i class="fas fa-edit me-1"></i> Modifier
+                                                </a>
+                                            {% else %}
+                                                <a href="{% url 'league:add_result' match.pk %}"
+                                                   class="btn btn-sm btn-success">
+                                                    <i class="fas fa-plus me-1"></i> Score
+                                                </a>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if match.is_played %}
+                                                <span class="badge bg-success">Joué</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">À jouer</span>
+                                            {% endif %}
                                         {% endif %}
                                     </td>
                                 </tr>
