@@ -5,6 +5,7 @@ Paramètres de développement et production.
 
 import os
 from pathlib import Path
+import dj_database_url
 
 # Répertoire de base du projet
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,12 +81,23 @@ WSGI_APPLICATION = 'goma_efootball.wsgi.application'
 # ========================
 # BASE DE DONNÉES
 # ========================
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# En production : PostgreSQL via DATABASE_URL
+# En développement : SQLite
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # ========================
 # VALIDATION MOT DE PASSE
